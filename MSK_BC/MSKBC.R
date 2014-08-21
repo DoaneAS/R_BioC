@@ -88,10 +88,10 @@ Index <- as.factor(pData(MSK.set)$class)
 ser <- levels(MSK.set$class)
 labcol <- ser[Index]
 or <- order(ser[Index])
-niceCols <- brewer.pal(10, "Spectral")
+niceCols <- brewer.pal(5, "Set1")
 z <- niceCols[Index]
 ###HEATMAP####
-pdf("Cluster.unsupdend.rescale.pdf",width=36,height=24)
+pdf("Cluster.unsupdend.rescale2.pdf",width=36,height=24)
 heatmap.2(d,
           #labCol=labcol,
           scale="row", 
@@ -130,40 +130,66 @@ ERgroup <- factor(pData(MSK.set)[,4 ] , levels = levels(pData(MSK.set)[,4]))
 #design <- model.matrix(~factor(MSK.set$ER))
 #or
 design <- model.matrix(~ERgroup)
+colnames(design) <- c("ER-", "ER+vER-")
 fit = lmFit(MSK.set, design)
 ebayes = eBayes(fit)
-tab <- topTable(ebayes, coef="ERgroupER-", adjust="fdr", n=150, genelist =  fit$genes$symbol)
+tab <- topTable(ebayes, coef="ER+vER-", adjust="BH", n=50, genelist =  fit$genes$symbol)
+
 labCol <- c("N", "P")[Index]
+or <- order(ser[Index])
+niceCols <- brewer.pal(5, "Set1")
+z <- niceCols[Index]
 #labCol <- c("P", "A", "B")[Index2]
-#labRow = fData(MSK.set)$symbol[Indexg]
 
-# y = exprs(MSK.set)
-# yx = exprs(MSK.set[tab$ID])
-# pdf("Cluster.unsupdend.rescale.pdf",width=36,height=48)
-# heatmap.2(y[rownames(tab),],
-#           labCol=labCol,
-#           labRow= tab[,"ID"],
-#           col=my_palette, trace= "none",
-#           key = FALSE)
-# dev.off()
+ y = exprs(MSK.set)
 
-# pdf("Cluster.unsupdend.rescale.pdf",width=36,height=48)
-# heatmap.2(y[tab[,"ID"],],
-#           labCol=labCol,
-#           #labRow= fit$genes$symbol,
-#           col=my_palette, trace= "none",
-#           key = FALSE)
-# dev.off()
-
-# Indexg = as.numeric(fData(MSK.set)$symbol)
 
 pdf("Cluster.unsupdend.rescale.pdf",width=36,height=48)
 heatmap.2(y[rownames(tab),],
-          
+          labRow= tab$ID,
           labCol = labCol,
           col=my_palette, trace= "none",
+          density="density",
+          ColSideColors=z,
           key=FALSE)
 dev.off()
+
+
+
+###ERP A B analysis (3 way) LIMMA ####
+f <- factor(MSK.set$class, levels=c("P","A","B"))
+design <- model.matrix(~0+f)
+
+colnames(design) <- c("P","A","B")
+fit <- lmFit(MSK.set, design)
+contrast.matrix <- makeContrasts(A-P, B-A, B-P, levels=design)
+fit2 <- contrasts.fit(fit, contrast.matrix)
+fit2 <- eBayes(fit2)
+topTable(fit2, coef=1, adjust="BH")
+results <- decideTests(fit2)
+results
+vennDiagram(results)
+tab = topTableF(fit2, number=175)
+
+#heatmap setup
+Index2 <- as.numeric(pData(MSK.set)$class)
+labCol <- c("P", "A", "B")[Index2]
+ser <- levels(MSK.set$class)
+or <- order(ser[Index2])
+niceCols <- brewer.pal(5, "Set1")
+z <- niceCols[Index2]
+
+pdf("Cluster.PvAvBLimma.pdf",width=36,height=48)
+heatmap.2(y[rownames(tab),],
+          labRow= tab$symbol,
+          labCol = labCol,
+          col=my_palette, trace= "none",
+          density="density",
+          ColSideColors=z,
+          key=FALSE)
+dev.off()
+
+
 
 #er n only#
 
@@ -178,18 +204,3 @@ esetSel <- MSK.set[selected,]
 esetSel
 
 
-dd$ds
-
-xb <- y[rownames(tab),]
-ac <- y[tab[,"ID"],]
-
-dim(xb)
-
-pdf("Cluster.unsupdend.rescale.pdf",width=36,height=48)
-heatmap.2(xb,
-          
-          labCol = labCol,
-          labRow = tab$ID,
-          col=my_palette, trace= "none",
-          key=FALSE)
-dev.off()
