@@ -180,7 +180,6 @@ esetSel
 
 dd$ds
 
-y[tab$ID,]
 xb <- y[rownames(tab),]
 ac <- y[tab[,"ID"],]
 
