@@ -4,7 +4,7 @@
 
 ###################
 #GCRMA processing
-###################
+#####################
 process.raw.affy.data<-function(cel.dir, output.dir){
   library(gcrma)    
   library(affy)

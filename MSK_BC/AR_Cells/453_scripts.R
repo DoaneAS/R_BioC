@@ -129,5 +129,6 @@ fit <- lmFit(M453.set, design)
 cont.D <- makeContrasts("D4-V", "D16-D4", "D48-D16", levels=design)
 fit2 <- contrasts.fit(fit, cont.D)
 fit2 <- eBayes(fit2)
-tab <- topTableF(fit2, n=100, adjust="BH")
+tab453 <- topTableF(fit2, n=100, adjust="BH")
 
+save(tab453, file="453DHT.Rdata")
