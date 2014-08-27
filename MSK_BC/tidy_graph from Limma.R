@@ -28,34 +28,56 @@ expData <- exp_ann_all %>%
   spread(sym_affy, exp)
 
 annData <- exp_ann_all %>%
-  select(Affy, symbol, genename, sym_affy) %>%
+  select(Affy, symbol, genename, sym_affy, P.Value, adj.P.Val) %>%
   unique()
 
 MSKtidy <- tbl_df(expData)
 MSKtidy
+save(MSKtidy, file="MSKtidy.Rdata")
 ##ggood##, now graph##
 
 
+
 library(ggplot2)
+library(RColorBrewer)
 
 classd <- MSKtidy$class
 
 MSKtidy[(gs[c(i,2)])]
 gs <- annData$sym_affy[1:10]
 gs
+annData[,2]
+gss <- names(MSKtidy)[c(-1,-2)]
 #works
-ggplot(MSKtidy, aes_string(x = "class", gs[1])) + geom_boxplot() + geom_point(position = position_jitter(w = 0.1, h = 0.1))
+ggplot(MSKtidy, aes_string(x = "class", annData[1,4])) + geom_boxplot(width=0.5, outlier.size = 0) + 
+  geom_point(aes(colour=class), alpha=0.7, size=2, position = position_jitter(w = 0.1, h = 0.1)) +
+  scale_color_brewer(palette="Set1") + ggtitle(paste(annData[1,2], "\n","adj p val=", (signif(annData[1,6],2))))
+
+                                               
+paste(annData[1,2], "\n", annData[1,6], digits = 2)
+
+paste(signif(annData[1,6],2))
+
+x <- annData[1,6]
+str(x)
+paste(x, digits = 3)
+
+
+annData$symbol <- as.character(annData$symbol)
+
 
 pdf("gs.pdf")
 print(ggplot(MSKtidy, aes_string(x = "class", gs[1])) + geom_boxplot())
 dev.off()
 
+boxp
+
 theme_set(theme_bw(base_family="Helvetica", base_size=10))
 
 ###working ggplot graph######
 pdf("gs.pdf")
-for (i in 1:length(gs)) {
-  print(ggplot(MSKtidy, aes_string(x = "class", gs[i])) + geom_boxplot() + geom_point(position = position_jitter(w = 0.1, h = 0.1)))}
+for (i in 1:length(annData$sym_affy)) {
+  print(ggplot(MSKtidy, aes_string(x = "class", annData[i,4])) + geom_boxplot(width=0.5, outlier.size = 0) + geom_point(aes(colour=class), alpha=0.7, size=2, position = position_jitter(w = 0.1, h = 0.1)) +scale_color_brewer(palette="Set1") + ggtitle(annData[i,2]))}
 dev.off()
 ############
 
