@@ -171,7 +171,16 @@ data(aml)
 #
 #if x1 values are unique and row numbers are the same (use %in% first), define a new variable x2 is df1 that is equal to df2x2:
 df1$x2[match(df2$x1,df1$x1)] <- df2$x2
-#if values are not unique:
+#if values are not unique / number of rows is different:
 for(id in 1:nrow(df2)){
   df1$x2[df1$x1 %in% df2$x1[id]] <- df2$x2[id]
 }
+
+#for example:
+for(id in 1:nrow(tab)){
+  exp$symbol[exp$Affy %in% tab$Affy[id]] <- tab$symbol[id]
+  exp$genename[exp$Affy %in% tab$Affy[id]] <- tab$genename[id]
+}
+
+
+

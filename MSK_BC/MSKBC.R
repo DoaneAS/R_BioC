@@ -157,6 +157,7 @@ dev.off()
 
 
 ###ERP A B analysis (3 way) LIMMA ####
+library(limma)
 f <- factor(MSK.set$class, levels=c("P","A","B"))
 design <- model.matrix(~0+f)
 
@@ -169,7 +170,7 @@ topTable(fit2, coef=1, adjust="BH")
 results <- decideTests(fit2)
 results
 vennDiagram(results)
-tab = topTableF(fit2, number=175)
+tab = topTableF(fit2, number=10)
 
 #heatmap setup
 Index2 <- as.numeric(pData(MSK.set)$class)
